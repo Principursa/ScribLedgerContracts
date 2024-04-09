@@ -6,7 +6,11 @@ import "./interfaces/IUniRouter.sol";
  
 
 contract SLRouter {
+    mapping (address=>mapping (address=>address)) public markets;
     function getPrice(address brand) external{
+
+    }
+    function createMarket() external {
 
     }
 
