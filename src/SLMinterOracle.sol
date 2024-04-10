@@ -10,32 +10,35 @@ import "./SLRouter.sol";
 
 contract SLMinterOracle{
     SLRouter slRouter;
+    IUniRouter uniRouter;
 
-    IUniswapRouter uniRouter;
+    mapping (address=>SLERC20) addressToBrands; //need better way to go between brands
+    mapping (string => SLERC20) stringToBrands;
 
-    mapping (address=>SLERC20) brands;
-
-    constructor(IUniswapRouter routerAddress){
+    constructor(IUniRouter routerAddress){
         uniRouter = routerAddress;
     }
-    function changeSlRouter(address router) external {
+    function setSLRouter(address router) external {
         slRouter = SLRouter(router);
     } 
 
-    function createBrand(string memory name,string memory symbol, uint mintAmt) public{
+    function createBrand(string memory name,string memory symbol, uint mintAmt, address receiver) public returns(SLERC20 brand){
         SLERC20 brand = new SLERC20(name,symbol);
         address  brandAddress = address(brand);
-        brands[brandAddress] = brand;
-        brand.mint(msg.sender,mintAmt);
-
+        addressToBrands[brandAddress] = brand;
+        stringToBrands[name] = brand;
+        brand.mint(receiver,mintAmt);
+        return brand;
     }
-    function mintBrand(address brand, uint mintAmt) public{
-
+    function mintBrand(SLERC20 brand, uint mintAmt, address receiver) public{
+        brand.mint(receiver,mintAmt);
     }
     function createMarket(address assetOne, address assetTwo, uint amtOne, uint amtTwo) public{
+        slRouter.createMarket(assetOne,assetTwo);
 
     }
-    function ProvLiquidity(address assetOne, address assetTwo, uint amtOne, uint amtTwo) public {
+    function addLiqudity(address assetOne, address assetTwo, uint amtOne, uint amtTwo) public {
+        slRouter.addLiquidity();
 
 
     }
