@@ -120,8 +120,14 @@ contract SLMinterOracleTest is Test {
             alice,
             1812835479
         );
+        brandone.approve(address(uniRouter), 1000);
+        address[] memory t  = new address[](2);
+        t[0] = address(brandone);
+        t[1] = address(brandtwo);
         uint prevTokenAmt = brandone.balanceOf(alice);
-       // uniRouter.swapExactTokensForTokens(1000, 0, [], alice, 1812835479);
+        uniRouter.swapExactTokensForTokens(1000, 0, t, alice, 1812835479);
+        uint newTokenAmt = brandone.balanceOf(alice);
+        assertGt(prevTokenAmt, newTokenAmt);
         //assertGt(SLERC20(pair).balanceOf(alice),0);
     }
 
@@ -146,7 +152,38 @@ contract SLMinterOracleTest is Test {
         assertGt(bobAmt,0);
     }
 
-    function testGetPrice() public {}
+    function testGetPrice() public {
+      startHoax(alice);
+        uint mintAmt = 1000;
+        SLERC20 brandone = slmintorac.createBrand(
+            "American Airlines Miles",
+            "AAMILES",
+            mintAmt,
+            alice
+        );
+        SLERC20 brandtwo = slmintorac.createBrand(
+            "StarBucks Points",
+            "STRPNTS",
+            mintAmt,
+            alice
+        );
+        address pair = factory.createPair(address(brandone), address(brandtwo));
+        uint liqAmt = 100 * 10 ** 18;
+        brandone.approve(address(uniRouter), liqAmt);
+        brandtwo.approve(address(uniRouter), liqAmt);
+        uniRouter.addLiquidity(
+            address(brandone),
+            address(brandtwo),
+            liqAmt,
+            liqAmt,
+            0,
+            0,
+            alice,
+            1812835479
+        );
+
+
+    }
 }
 
 // BRANDS

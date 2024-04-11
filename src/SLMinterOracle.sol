@@ -6,6 +6,7 @@ import "solmate/auth/Auth.sol"; //@NOTE: implement auth, probably only need 1, o
 import "./interfaces/IUniRouter.sol";
 import "./SLERC20.sol";
 import "./SLRouter.sol";
+import "./SLCard.sol";
 
 
 contract SLMinterOracle{
@@ -15,7 +16,7 @@ contract SLMinterOracle{
 
     mapping (address=>SLERC20) addressToBrands; //need better way to go between brands
     mapping (string => SLERC20) stringToBrands;
-    mapping(address => address) brandsToCards;
+    mapping(address => SLCard) brandsToCards;
 
     constructor(IUniRouter routerAddress){
         uniRouter = routerAddress;
@@ -38,7 +39,8 @@ contract SLMinterOracle{
     function transferBrand(SLERC20 brand,uint transferAmt, address receiver) public {
         brand.transfer(receiver,transferAmt);
     }
-    function transferToCard() public {
+    function transferToCard(SLERC20 brand, uint transferAmt, SLCard card) public {
+
 
     }
 
