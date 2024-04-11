@@ -16,9 +16,20 @@ contract SLScript is Script{
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
         SLMinterOracle slminteroracle = new SLMinterOracle(uniswapRouterAddress);
-        SLERC20 brandone = slminteroracle.createBrand("DELTA MILES", "DLT MLS", 1000, msg.sender);
-        console.log("delta miles deployed at:",address(brandone));
-        console.log("delta miles balance:",brandone.balanceOf(msg.sender));
+        SLERC20 deltamiles = slminteroracle.createBrand("Delta Miles", "MILES", 52000, msg.sender);
+        SLERC20 starbucks = slminteroracle.createBrand("Starbucks Points", "POINTS", 2439, msg.sender);
+        SLERC20 walmart = slminteroracle.createBrand("Walmart Points", "POINTS", 2299, msg.sender);
+        SLERC20 shell = slminteroracle.createBrand("Shell Gallons", "GALLONS", 744, msg.sender);
+        SLERC20 regal = slminteroracle.createBrand("Regal Cinema Points", "POINTS", 3077, msg.sender);
+        SLERC20 mcdonalds = slminteroracle.createBrand("McDonalds Points", "POINTS", 2667, msg.sender);
+        SLERC20 amazon = slminteroracle.createBrand("Amazon Points", "POINTS", 2273, msg.sender);
+        SLERC20 sephora = slminteroracle.createBrand("Sephora Points", "POINTS", 2500, msg.sender);
+        SLERC20 walgreens = slminteroracle.createBrand("Walgreen Points", "POINTS", 3077, msg.sender);
+        SLERC20 lyft = slminteroracle.createBrand("Lyft Points", "POINTS", 2469, msg.sender);
+
+
+        console.log("delta miles deployed at:",address(deltamiles));
+        console.log("delta miles balance:",deltamiles.balanceOf(msg.sender));
         console.log("slMinterOracle deployed at:",address(slminteroracle));
         vm.stopBroadcast();
     }
