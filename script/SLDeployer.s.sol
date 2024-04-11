@@ -8,10 +8,10 @@ import {SLERC20} from "../src/SLERC20.sol";
 import {IUniswapFactory} from "../src/interfaces/IUniFactory.sol";
 
 contract SLScript is Script{
-    IUniRouter uniswapRouterAddress;
+    IUniRouter uniRouter;
     IUniswapFactory factory;
     function setUp() public {
-        uniswapRouterAddress = IUniRouter(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
+        uniRouter = IUniRouter(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
         factory = IUniswapFactory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
 
     }
@@ -19,7 +19,7 @@ contract SLScript is Script{
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
-        SLMinterOracle slminteroracle = new SLMinterOracle(uniswapRouterAddress);
+        SLMinterOracle slminteroracle = new SLMinterOracle(uniRouter);
         SLERC20 deltamiles = slminteroracle.createBrand("Delta Miles", "MILES", 100000, msg.sender);
         SLERC20 starbucks = slminteroracle.createBrand("Starbucks Points", "POINTS", 100000, msg.sender);
         SLERC20 walmart = slminteroracle.createBrand("Walmart Points", "POINTS", 100000, msg.sender);
@@ -30,8 +30,8 @@ contract SLScript is Script{
         SLERC20 sephora = slminteroracle.createBrand("Sephora Points", "POINTS", 100000, msg.sender);
         SLERC20 walgreens = slminteroracle.createBrand("Walgreen Points", "POINTS", 100000, msg.sender);
         SLERC20 lyft = slminteroracle.createBrand("Lyft Points", "POINTS", 100000, msg.sender);
-        factory.createPair(address(deltamiles),address(starbucks));
-        factory.createPair(address(starbucks),address(walmart));
+        address pairone = factory.createPair(address(deltamiles),address(starbucks));
+        address pairtwo = factory.createPair(address(starbucks),address(walmart));
         factory.createPair(address(walmart),address(shell));
         factory.createPair(address(shell),address(regal));
         factory.createPair(address(regal),address(mcdonalds));
@@ -40,10 +40,17 @@ contract SLScript is Script{
         factory.createPair(address(sephora),address(walgreens));
         factory.createPair(address(walgreens),address(lyft));
         factory.createPair(address(lyft),address(deltamiles));
-
-
-
-
+/* 
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
+        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline); */
 
         console.log("delta miles deployed at:",address(deltamiles));
         console.log("delta miles balance:",deltamiles.balanceOf(msg.sender));

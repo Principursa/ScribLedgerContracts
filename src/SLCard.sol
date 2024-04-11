@@ -8,7 +8,7 @@ contract SLCard {
     constructor(address _token) {
         token = SLERC20(_token);
     }
-    function transferRewards(address receiver){
+    function transferRewards(address receiver) public{
         uint contractBalance = token.balanceOf(address(this)); 
         token.transfer(receiver, contractBalance);
     }
