@@ -33,15 +33,10 @@ contract SLMinterOracle{
     function mintBrand(SLERC20 brand, uint mintAmt, address receiver) public{
         brand.mint(receiver,mintAmt);
     }
-    function createMarket(address assetOne, address assetTwo, uint amtOne, uint amtTwo) public{
-        slRouter.createMarket(assetOne,assetTwo);
-
+    function transferBrand(SLERC20 brand,uint transferAmt, address receiver) public {
+        brand.transfer(receiver,transferAmt);
     }
-    function addLiqudity(address assetOne, address assetTwo, uint amtOne, uint amtTwo) public {
-        slRouter.addLiquidity();
 
-
-    }
     function FeTestCall() public{
         //don't implement now
     }

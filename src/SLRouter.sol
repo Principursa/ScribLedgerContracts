@@ -14,16 +14,6 @@ contract SLRouter {
     }
     mapping (address=>mapping (address=>address)) public markets;
     function getPrice(address brand) external{
-
-
-
-    }
-    function createMarket(address tokenA, address tokenB) external {
-        factory.createPair(tokenA, tokenB);
-    }
-    function addLiquidity() external{
-
-
     }
 
 }
