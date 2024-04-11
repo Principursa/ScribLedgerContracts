@@ -11,7 +11,20 @@ contract SLScript is Script {
     IUniRouter uniRouter;
     IUniswapFactory factory;
     address mainAddress;
-    //SLERC20[] tokens;
+    uint mintAmt = 10000000;
+    SLERC20[] tokens;
+    uint[10] liqAmounts = [
+        52000,
+        2440,
+        2300,
+        744,
+        3078,
+        2667,
+        2280,
+        2500,
+        3080,
+        2500
+    ];
 
     function setUp() public {
         uniRouter = IUniRouter(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
@@ -20,77 +33,113 @@ contract SLScript is Script {
     }
 
     function createPairs() public {
-
+        for (uint i = 0; i < tokens.length; i++) {
+            uint tokenA = i;
+            uint tokenB = i + 1;
+            if (i == tokens.length -1) {
+                tokenB = 0;
+            }
+            address pair = factory.createPair(address(tokens[tokenA]),address(tokens[tokenB]));
+            console.log("pair created for",tokens[tokenA].name());
+            console.log(tokens[tokenB].name());
+            console.log("address for pair",pair);
+        }
     }
-    function addLiquidities() public {
 
+    function addLiquidities() public {}
+
+    function approveAll() public {
+        for (uint i = 0; i < tokens.length; i++) {
+            tokens[i].approve(address(uniRouter), liqAmounts[i] * 10 ** 18);
+        }
     }
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
         SLMinterOracle slminteroracle = new SLMinterOracle(uniRouter);
-        SLERC20 deltamiles = slminteroracle.createBrand(
-            "Delta Miles",
-            "MILES",
-            100000,
-            mainAddress
+
+        tokens.push(
+            slminteroracle.createBrand(
+                "Delta Miles",
+                "MILES",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 starbucks = slminteroracle.createBrand(
-            "Starbucks Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Starbucks Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 walmart = slminteroracle.createBrand(
-            "Walmart Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Walmart Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
         );
-   /*      SLERC20 shell = slminteroracle.createBrand(
-            "Shell Gallons",
-            "GALLONS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Shell Gallons",
+                "GALLONS",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 regal = slminteroracle.createBrand(
-            "Regal Cinema Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Regal Cinema Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 mcdonalds = slminteroracle.createBrand(
-            "McDonalds Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "McDonalds Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 amazon = slminteroracle.createBrand(
-            "Amazon Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Amazon Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 sephora = slminteroracle.createBrand(
-            "Sephora Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Sephora Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
         );
-        SLERC20 walgreens = slminteroracle.createBrand(
-            "Walgreen Points",
-            "POINTS",
-            100000,
-            mainAddress
+        tokens.push(
+            slminteroracle.createBrand(
+                "Walgreen Points",
+                "POINTS",
+                100000,
+                mainAddress
+            )
         );
-        SLERC20 lyft = slminteroracle.createBrand(
-            "Lyft Points",
-            "POINTS",
-            100000,
-            mainAddress
-        ); */
-   /*      address pairone = factory.createPair(
+        tokens.push(
+            slminteroracle.createBrand(
+                "Lyft Points",
+                "POINTS",
+                mintAmt,
+                mainAddress
+            )
+        );
+        /*      address pairone = factory.createPair(
             address(deltamiles),
             address(starbucks)
         );
@@ -107,11 +156,13 @@ contract SLScript is Script {
         address paireight = factory.createPair(address(sephora),address(walgreens));
         address pairnine = factory.createPair(address(walgreens),address(lyft));
         address pairten = factory.createPair(address(lyft),address(deltamiles));*/
-        deltamiles.approve(address(uniRouter), 52000 * 10 ** 18);
-        starbucks.approve(address(uniRouter), 2440 * 10 ** 18);
-        walmart.approve(address(uniRouter), 2300 * 10 ** 18);
+        /*     tokens[0].approve(address(uniRouter), 52000 * 10 ** 18);
+        tokens[1].approve(address(uniRouter), 2440 * 10 ** 18);
+        tokens[2].approve(address(uniRouter), 2300 * 10 ** 18); */
+        createPairs();
+        approveAll();
         //shell.approve(address(uniRouter), 744 * 10 ** 18);
-    /*     uniRouter.addLiquidity(
+        /*     uniRouter.addLiquidity(
             address(deltamiles),
             address(starbucks),
             21000 * 10 ** 18,
@@ -143,16 +194,16 @@ contract SLScript is Script {
         uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
         uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);  */
 
-        console.log("delta miles deployed at:", address(deltamiles));
-        console.log("starbucks deployed at:", address(starbucks));
-        console.log("walmart deployed at:", address(walmart));
+        console.log("delta miles deployed at:", address(tokens[0]));
+        console.log("starbucks deployed at:", address(tokens[1]));
+        console.log("walmart deployed at:", address(tokens[2]));
         //console.log("shell deployed at:", address(shell));
 
         console.log(
             "delta miles card deployed at:",
-            address(slminteroracle.returnCard(address(deltamiles)))
+            address(slminteroracle.returnCard(address(tokens[0])))
         );
-      /*   console.log(
+        /*   console.log(
             "starbucks card deployed at:",
             address(slminteroracle.returnCard(address(starbucks)))
         );
@@ -164,11 +215,11 @@ contract SLScript is Script {
             "shell card deployed at:",
             address(slminteroracle.returnCard(address(shell)))
         ); */
-    /*     console.log(
+        /*     console.log(
             "pairone deployed at:",
             pairone
         ); */
-       /*  console.log(
+        /*  console.log(
             "pairtwo deployed at:",
             pairtwo
         ); */

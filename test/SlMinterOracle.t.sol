@@ -7,6 +7,7 @@ import {SLRouter} from "../src/SLRouter.sol";
 import {IUniRouter} from "../src/interfaces/IUniRouter.sol";
 import {IUniswapFactory} from "../src/interfaces/IUniFactory.sol";
 import {SLERC20} from "../src/SLERC20.sol";
+import {SLCard} from "../src/SLCard.sol";
 
 //@NOTE: Test from forked chain (arbitrum)
 //unofficial uniswap address on arbitrum sepolia is 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008
@@ -121,7 +122,7 @@ contract SLMinterOracleTest is Test {
             1812835479
         );
         brandone.approve(address(uniRouter), 1000);
-        address[] memory t  = new address[](2);
+        address[] memory t = new address[](2);
         t[0] = address(brandone);
         t[1] = address(brandtwo);
         uint prevTokenAmt = brandone.balanceOf(alice);
@@ -146,14 +147,33 @@ contract SLMinterOracleTest is Test {
             mintAmt,
             alice
         );
-        brandone.transfer(address(slmintorac),1000);
+        brandone.transfer(address(slmintorac), 1000);
         slmintorac.transferBrand(brandone, 1000, bob);
         uint bobAmt = brandone.balanceOf(bob);
-        assertGt(bobAmt,0);
+        assertGt(bobAmt, 0);
+    }
+
+    function testSLCard() public {
+        startHoax(alice);
+        uint mintAmt = 1000;
+        SLERC20 mintedAsset = slmintorac.createBrand(
+            "American Airlines Miles",
+            "AAMILES",
+            mintAmt,
+            alice
+        );
+        uint prevAmt = mintedAsset.balanceOf(alice);
+        SLCard slcard = slmintorac.returnCard(address(mintedAsset)); 
+
+        slcard.transferToCard();
+        slcard.transferRewards(alice);
+        console.log(mintedAsset.balanceOf(alice));
+        assertGt(mintedAsset.balanceOf(alice),prevAmt);
+        //assertEq(mintAmt * 10 ** 18, mintedAsset.balanceOf(alice));
     }
 
     function testGetPrice() public {
-      startHoax(alice);
+        startHoax(alice);
         uint mintAmt = 1000;
         SLERC20 brandone = slmintorac.createBrand(
             "American Airlines Miles",
@@ -181,8 +201,6 @@ contract SLMinterOracleTest is Test {
             alice,
             1812835479
         );
-
-
     }
 }
 
