@@ -12,8 +12,10 @@ contract SLMinterOracle{
     SLRouter slRouter;
     IUniRouter uniRouter;
 
+
     mapping (address=>SLERC20) addressToBrands; //need better way to go between brands
     mapping (string => SLERC20) stringToBrands;
+    mapping(address => address) brandsToCards;
 
     constructor(IUniRouter routerAddress){
         uniRouter = routerAddress;
@@ -35,6 +37,9 @@ contract SLMinterOracle{
     }
     function transferBrand(SLERC20 brand,uint transferAmt, address receiver) public {
         brand.transfer(receiver,transferAmt);
+    }
+    function transferToCard() public {
+
     }
 
     function FeTestCall() public{
