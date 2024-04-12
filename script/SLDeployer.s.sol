@@ -28,9 +28,9 @@ contract SLScript is Script {
     ];
 
     function setUp() public {
-        uniRouter = IUniRouter(0x444519c512Ec3528e8c3D8D44FF9A5e5e867Ae2d);
+        uniRouter = IUniRouter(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
         factory = IUniswapFactory(uniRouter.factory());
-        mainAddress = 0xB54271D82813D21F8508FFffc005EdeDf72E1Bf9;
+        mainAddress = 0xAe443A7dbB2252Ee2AF1b4c9eEE755a1b2417ab4;
         slminteroracle = new SLMinterOracle(uniRouter);
     }
 
@@ -54,8 +54,8 @@ contract SLScript is Script {
     function addLiquidities() public {
         for (uint i = 0; i < tokens.length; i++) {
             uint tokenA = i;
-            uint tokenB = i +1;
-            if (i == tokens.length - 1){
+            uint tokenB = i + 1;
+            if (i == tokens.length - 1) {
                 tokenB = 0;
             }
             uniRouter.addLiquidity(
@@ -73,26 +73,47 @@ contract SLScript is Script {
 
     function approveAll() public {
         for (uint i = 0; i < tokens.length; i++) {
-            console.log("approving token",address(tokens[i]));
+            console.log("approving token", address(tokens[i]));
             tokens[i].approve(address(uniRouter), liqAmounts[i] * 10 ** 18);
         }
     }
-    function logTokenDeployments() public {
-        for (uint i = 0; i < tokens.length; i++){
-            console.log("token:",tokens[i].name());
-            console.log("deployed at:",address(tokens[i]));
-            console.log("card deployed at:",address(slminteroracle.returnCard(address(tokens[i]))));
-        }
 
+    function logTokenDeployments() public {
+        for (uint i = 0; i < tokens.length; i++) {
+            console.log("token:", tokens[i].name());
+            console.log("deployed at:", address(tokens[i]));
+            console.log(
+                "card deployed at:",
+                address(slminteroracle.returnCard(address(tokens[i])))
+            );
+        }
     }
 
-    function run() public {
+    function getChainId() public view returns (uint256) {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        return chainId;
+    }
+
+    function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+
+        address deployerAddress = vm.addr(deployerPrivateKey);
+        console.log("Deployer address: ", deployerAddress);
+        console.log("Deployer balance: ", deployerAddress.balance);
+        console.log("BlockNumber: ", block.number);
+        console.log("ChainId: ", getChainId());
+        console.log("Deploying");
+
         vm.startBroadcast(deployerPrivateKey);
+
+        console.log("slMinterOracle deployed at:", address(slminteroracle));
 
         tokens.push(
             slminteroracle.createBrand(
-                "Delta", 
+                "Delta",
                 "Miles",
                 liqAmounts[0] + 2000,
                 mainAddress
@@ -175,8 +196,7 @@ contract SLScript is Script {
         createPairs();
         approveAll();
         addLiquidities();
-    
-        console.log("slMinterOracle deployed at:", address(slminteroracle));
+
         vm.stopBroadcast();
     }
 }

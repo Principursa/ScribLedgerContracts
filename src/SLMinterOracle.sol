@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.25;
 
-import "solmate/tokens/ERC20.sol";
-import "solmate/auth/Auth.sol"; //@NOTE: implement auth, probably only need 1, owner/minter
+//import "solmate/auth/Auth.sol"; //@NOTE: implement auth, probably only need 1, owner/minter
 import "./interfaces/IUniRouter.sol";
 import "./SLERC20.sol";
 import "./SLRouter.sol";
@@ -12,6 +11,7 @@ import "./SLCard.sol";
 contract SLMinterOracle{
     SLRouter slRouter;
     IUniRouter uniRouter;
+    uint seed = 2832839438;
 
     mapping (address=>SLERC20) addressToBrands;
     mapping (string => SLERC20) stringToBrands;
