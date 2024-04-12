@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.25;
 
 import {Script, console} from "forge-std/Script.sol";
 import {SLMinterOracle} from "../src/SLMinterOracle.sol";
@@ -11,6 +11,7 @@ contract SLScript is Script {
     IUniRouter uniRouter;
     IUniswapFactory factory;
     address mainAddress;
+    SLMinterOracle slminteroracle;
     uint mintAmt = 10000000;
     SLERC20[] tokens;
     uint[10] liqAmounts = [
@@ -27,202 +28,154 @@ contract SLScript is Script {
     ];
 
     function setUp() public {
-        uniRouter = IUniRouter(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
-        factory = IUniswapFactory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
+        uniRouter = IUniRouter(0x444519c512Ec3528e8c3D8D44FF9A5e5e867Ae2d);
+        factory = IUniswapFactory(uniRouter.factory());
         mainAddress = 0xB54271D82813D21F8508FFffc005EdeDf72E1Bf9;
+        slminteroracle = new SLMinterOracle(uniRouter);
     }
 
     function createPairs() public {
         for (uint i = 0; i < tokens.length; i++) {
             uint tokenA = i;
             uint tokenB = i + 1;
-            if (i == tokens.length -1) {
+            if (i == tokens.length - 1) {
                 tokenB = 0;
             }
-            address pair = factory.createPair(address(tokens[tokenA]),address(tokens[tokenB]));
-            console.log("pair created for",tokens[tokenA].name());
+            address pair = factory.createPair(
+                address(tokens[tokenA]),
+                address(tokens[tokenB])
+            );
+            console.log("pair created for", tokens[tokenA].name());
             console.log(tokens[tokenB].name());
-            console.log("address for pair",pair);
+            console.log("address for pair", pair);
         }
     }
 
-    function addLiquidities() public {}
+    function addLiquidities() public {
+        for (uint i = 0; i < tokens.length; i++) {
+            uint tokenA = i;
+            uint tokenB = i +1;
+            if (i == tokens.length - 1){
+                tokenB = 0;
+            }
+            uniRouter.addLiquidity(
+                address(tokens[tokenA]),
+                address(tokens[tokenB]),
+                (liqAmounts[tokenA] / 2) * 10 ** 18, //divide by 2
+                (liqAmounts[tokenB] / 2) * 10 ** 18,
+                0,
+                0,
+                mainAddress,
+                1812835479
+            );
+        }
+    }
 
     function approveAll() public {
         for (uint i = 0; i < tokens.length; i++) {
+            console.log("approving token",address(tokens[i]));
             tokens[i].approve(address(uniRouter), liqAmounts[i] * 10 ** 18);
         }
+    }
+    function logTokenDeployments() public {
+        for (uint i = 0; i < tokens.length; i++){
+            console.log("token:",tokens[i].name());
+            console.log("deployed at:",address(tokens[i]));
+            console.log("card deployed at:",address(slminteroracle.returnCard(address(tokens[i]))));
+        }
+
     }
 
     function run() public {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
-        SLMinterOracle slminteroracle = new SLMinterOracle(uniRouter);
 
         tokens.push(
             slminteroracle.createBrand(
-                "Delta Miles",
-                "MILES",
-                mintAmt,
+                "Delta", 
+                "Miles",
+                liqAmounts[0] + 2000,
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Starbucks Points",
-                "POINTS",
-                mintAmt,
+                "Starbucks",
+                "Points",
+                liqAmounts[1] + 36,
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Walmart Points",
-                "POINTS",
-                mintAmt,
+                "Walmart",
+                "Points",
+                liqAmounts[2],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Shell Gallons",
-                "GALLONS",
-                mintAmt,
+                "Shell",
+                "Gallons",
+                liqAmounts[3],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Regal Cinema Points",
-                "POINTS",
-                mintAmt,
+                "Regal Cinema",
+                "Points",
+                liqAmounts[4],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "McDonalds Points",
-                "POINTS",
-                mintAmt,
+                "McDonalds",
+                "Points",
+                liqAmounts[5],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Amazon Points",
-                "POINTS",
-                mintAmt,
+                "Amazon",
+                "Points",
+                liqAmounts[6],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Sephora Points",
-                "POINTS",
-                mintAmt,
+                "Sephora",
+                "Points",
+                liqAmounts[7],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Walgreen Points",
-                "POINTS",
-                100000,
+                "Walgreens",
+                "Points",
+                liqAmounts[8],
                 mainAddress
             )
         );
         tokens.push(
             slminteroracle.createBrand(
-                "Lyft Points",
-                "POINTS",
-                mintAmt,
+                "Lyft",
+                "Points",
+                liqAmounts[9],
                 mainAddress
             )
         );
-        /*      address pairone = factory.createPair(
-            address(deltamiles),
-            address(starbucks)
-        );
-        address pairtwo = factory.createPair(
-            address(starbucks),
-            address(walmart)
-        ); */
-        //address pairthree = factory.createPair(address(walmart), address(shell));
-        /*  
-        address pairfour = factory.createPair(address(shell),address(regal));
-        address pairfive = factory.createPair(address(regal),address(mcdonalds));
-        address pairsix = factory.createPair(address(mcdonalds),address(amazon));
-        address pairseven = factory.createPair(address(amazon),address(sephora));
-        address paireight = factory.createPair(address(sephora),address(walgreens));
-        address pairnine = factory.createPair(address(walgreens),address(lyft));
-        address pairten = factory.createPair(address(lyft),address(deltamiles));*/
-        /*     tokens[0].approve(address(uniRouter), 52000 * 10 ** 18);
-        tokens[1].approve(address(uniRouter), 2440 * 10 ** 18);
-        tokens[2].approve(address(uniRouter), 2300 * 10 ** 18); */
+
+        logTokenDeployments();
         createPairs();
         approveAll();
-        //shell.approve(address(uniRouter), 744 * 10 ** 18);
-        /*     uniRouter.addLiquidity(
-            address(deltamiles),
-            address(starbucks),
-            21000 * 10 ** 18,
-            1220 * 10 ** 18,
-            0,
-            0,
-            mainAddress,
-            1812835479
-        );
-        uniRouter.addLiquidity(
-            address(starbucks),
-            address(walmart),
-            1220 * 10 ** 18,
-            1150 * 10 ** 18,
-            0,
-            0,
-            mainAddress,
-            1812835479
-        ); */
-        //uniRouter.addLiquidity(address(deltamiles), address(starbucks), 26000 * 10 ** 18, 1220 * 10 ** 18, 0, 0, msg.sender, 1812835479);
-        //uniRouter.addLiquidity(address(deltamiles), address(starbucks),100,100, 1, 1, msg.sender, 1912835479);
-        //uniRouter.addLiquidity(address(starbucks), address(walmart), 1220, 1150, 0, 0, msg.sender, 1812835479);
-        /*    uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
-        uniRouter.addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);  */
-
-        console.log("delta miles deployed at:", address(tokens[0]));
-        console.log("starbucks deployed at:", address(tokens[1]));
-        console.log("walmart deployed at:", address(tokens[2]));
-        //console.log("shell deployed at:", address(shell));
-
-        console.log(
-            "delta miles card deployed at:",
-            address(slminteroracle.returnCard(address(tokens[0])))
-        );
-        /*   console.log(
-            "starbucks card deployed at:",
-            address(slminteroracle.returnCard(address(starbucks)))
-        );
-        console.log(
-            "walmart card deployed at:",
-            address(slminteroracle.returnCard(address(walmart)))
-        );
-        console.log(
-            "shell card deployed at:",
-            address(slminteroracle.returnCard(address(shell)))
-        ); */
-        /*     console.log(
-            "pairone deployed at:",
-            pairone
-        ); */
-        /*  console.log(
-            "pairtwo deployed at:",
-            pairtwo
-        ); */
+        addLiquidities();
+    
         console.log("slMinterOracle deployed at:", address(slminteroracle));
         vm.stopBroadcast();
     }

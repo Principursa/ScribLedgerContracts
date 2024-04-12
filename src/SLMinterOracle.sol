@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.25;
 
 import "solmate/tokens/ERC20.sol";
 import "solmate/auth/Auth.sol"; //@NOTE: implement auth, probably only need 1, owner/minter
@@ -13,8 +13,7 @@ contract SLMinterOracle{
     SLRouter slRouter;
     IUniRouter uniRouter;
 
-
-    mapping (address=>SLERC20) addressToBrands; //need better way to go between brands
+    mapping (address=>SLERC20) addressToBrands;
     mapping (string => SLERC20) stringToBrands;
     mapping(address => SLCard) brandsToCards;
 
@@ -47,10 +46,6 @@ contract SLMinterOracle{
     }
     function transferToCard(SLERC20 brand, uint transferAmt, SLCard card) public {
         brand.transfer(address(card), transferAmt);
-    }
-
-    function FeTestCall() public {
-        //don't implement now
     }
 
 

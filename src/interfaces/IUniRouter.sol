@@ -2,6 +2,7 @@
 pragma solidity ^0.8.25;
 
 interface IUniRouter {
+    function factory() external returns (address);
     function getAmountOut(
         uint amountIn,
         uint reserveIn,
